@@ -1,10 +1,31 @@
 #!/usr/bin/env ruby
-
 require 'github_streak_check'
+require 'optparse'
 
-if ARGV.size == 0 || %w(-h --help).include?(ARGV[0])
-  puts "usage: github_streak_check USERNAME"
-  puts "(exit status will be 1 when check is failed.)"
-else
-  GithubStreakCheck.new(ARGV[0]).run
+opts = {}
+option = OptionParser.new{|o|
+  o.banner = 'usage: github_streak_check USERNAME [options]'
+
+  o.on '-m', '--mail ADDRESS', 'Mail address to send notification(optional)' do |addr|
+    opts[:mail_to] = addr
+  end
+  o.on '-q', '--quiet', 'Supress message' do
+    $stdout = nil
+    $stderr = nil
+  end
+  o.on '-v', '--version', 'Show version' do
+    puts GithubStreakCheck::VERSION
+    exit
+  end
+  o.on '-h', '--help', 'Show this message' do
+    puts o
+    exit
+  end
+}
+rest = option.parse(ARGV)
+unless (opts[:username] = rest[0])
+  puts option
+  exit
 end
+
+GithubStreakCheck.new(opts).run
