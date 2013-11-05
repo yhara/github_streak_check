@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = GithubStreakCheck::VERSION
   spec.authors       = ["Yutaka HARA"]
   spec.email         = ["yutaka.hara+github@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
-  spec.homepage      = ""
+  spec.description   = %q{Checks if you already done today's commit}
+  spec.summary       = %q{Checks if you already done today's commit for GitHub's "Longest Streak" feature.}
+  spec.homepage      = "https://github.com/yhara/github_streak_check"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
@@ -18,6 +18,10 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
+  spec.add_runtime_dependency "pony", "~> 1.5.1"
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
+  spec.add_development_dependency "rspec", "~> 2.14"
+  spec.add_development_dependency "fakeweb", "~> 1.3.0"
+  spec.add_development_dependency "timecop", "~> 0.6.3"
 end

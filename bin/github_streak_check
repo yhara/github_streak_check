@@ -1,3 +1,10 @@
 #!/usr/bin/env ruby
 
 require 'github_streak_check'
+
+if ARGV.size == 0 || %w(-h --help).include?(ARGV[0])
+  puts "usage: github_streak_check USERNAME"
+  puts "(exit status will be 1 when check is failed.)"
+else
+  GithubStreakCheck.new(ARGV[0]).run
+end
