@@ -7,49 +7,66 @@ FakeWeb.allow_net_connect = false
 describe GithubStreakCheck do
   before do
     @login = "taro"
+    @checker = GithubStreakCheck.new(username: @login) 
   end
 
   describe "#commited_today?" do
-    context "When no event was found" do
-      before do
-        FakeWeb.register_uri(:get,
-          "https://api.github.com/users/#{@login}/events?per_page=1",
-          body: "[]"
-        )
-      end
+    it "<no events> : false" do
+      FakeWeb.register_uri(:get,
+        "https://api.github.com/users/#{@login}/events?per_page=1",
+        body: "[]"
+      )
+      expect(@checker.commited_today?).to be_false
+    end
 
-      it "should return false" do
-        expect(GithubStreakCheck.new(@login).commited_today?).to be_false
+    it "<yesterday's event> : false" do
+      FakeWeb.register_uri(:get,
+        "https://api.github.com/users/#{@login}/events?per_page=1",
+        body: '[{"created_at":"2013-11-04T10:47:16Z"}]'
+                         # == "2013-11-04T02:47:16-08:00"
+                       
+      )
+      Timecop.freeze(Time.parse("2013-11-05T07:00:00-08:00")) do
+        expect(@checker.commited_today?).to be_false
       end
     end
 
-    context "When today's event was not found" do
-      before do
-        FakeWeb.register_uri(:get,
-          "https://api.github.com/users/#{@login}/events?per_page=1",
-          body: '[{"created_at":"2013-11-04T10:47:16Z"}]'
-        )
-      end
-
-      it "should return false" do
-        Timecop.freeze(Date.new(2013, 11, 5)) do
-          expect(GithubStreakCheck.new(@login).commited_today?).to be_false
-        end
+    it "<today's event> : true" do
+      FakeWeb.register_uri(:get,
+        "https://api.github.com/users/#{@login}/events?per_page=1",
+        body: '[{"created_at":"2013-11-04T10:47:16Z"}]'
+                         # == "2013-11-04T02:47:16-08:00"
+                       
+      )
+      Timecop.freeze(Time.parse("2013-11-04T07:00:00-08:00")) do
+        expect(@checker.commited_today?).to be_true
       end
     end
 
-    context "When today's event was found" do
-      before do
-        FakeWeb.register_uri(:get,
-          "https://api.github.com/users/#{@login}/events?per_page=1",
-          body: '[{"created_at":"2013-11-04T10:47:16Z"}]'
-        )
+    it "<today's event> <tomorrow's event> : true" do
+      FakeWeb.register_uri(:get,
+        "https://api.github.com/users/#{@login}/events?per_page=1",
+        body: '[{"created_at":"2013-11-05T10:47:16Z"},' +
+                         # == "2013-11-05T02:47:16-08:00"
+               '{"created_at":"2013-11-04T10:47:16Z"}]'
+                         # == "2013-11-04T02:47:16-08:00"
+                       
+      )
+      Timecop.freeze(Time.parse("2013-11-04T07:00:00-08:00")) do
+        expect(@checker.commited_today?).to be_true
       end
+    end
 
-      it "should return true" do
-        Timecop.freeze(Date.new(2013, 11, 4)) do
-          expect(GithubStreakCheck.new(@login).commited_today?).to be_true
-        end
+    # Note: this happens when user is living in Tokyo, for example.
+    it "<tomorrow's event> : false" do
+      FakeWeb.register_uri(:get,
+        "https://api.github.com/users/#{@login}/events?per_page=1",
+        body: '[{"created_at":"2013-11-04T10:47:16Z"}]'
+                         # == "2013-11-04T02:47:16-08:00"
+                       
+      )
+      Timecop.freeze(Time.parse("2013-11-03T07:00:00-08:00")) do
+        expect(@checker.commited_today?).to be_false
       end
     end
   end

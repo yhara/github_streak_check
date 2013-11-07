@@ -1,7 +1,7 @@
 require "github_streak_check/version"
 require 'open-uri'
 require 'json'
-require 'date'
+require 'active_support/time'
 require 'pony'
 
 class GithubStreakCheck
@@ -28,12 +28,12 @@ class GithubStreakCheck
   end
 
   def commited_today?
-    json = JSON.parse(open("https://api.github.com/users/#{@opts[:username]}/events?per_page=1").read)
-    return false if json.length == 0
+    events = JSON.parse(open("https://api.github.com/users/#{@opts[:username]}/events?per_page=1").read)
+    return false if events.length == 0
 
-    event = json.first
-    event_time = Time.parse(event["created_at"])
-
-    return (event_time.to_date == Date.today)
+    pst_today = ActiveSupport::TimeZone["Pacific Time (US & Canada)"].today
+    return events.any?{|event|
+      Time.parse(event["created_at"]).to_date == pst_today
+    }
   end
 end
