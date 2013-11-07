@@ -13,7 +13,7 @@ describe GithubStreakCheck do
   describe "#commited_today?" do
     it "<no events> : false" do
       FakeWeb.register_uri(:get,
-        "https://api.github.com/users/#{@login}/events?per_page=1",
+        "https://api.github.com/users/#{@login}/events?per_page=300",
         body: "[]"
       )
       expect(@checker.commited_today?).to be_false
@@ -21,7 +21,7 @@ describe GithubStreakCheck do
 
     it "<yesterday's event> : false" do
       FakeWeb.register_uri(:get,
-        "https://api.github.com/users/#{@login}/events?per_page=1",
+        "https://api.github.com/users/#{@login}/events?per_page=300",
         body: '[{"created_at":"2013-11-04T10:47:16Z"}]'
                          # == "2013-11-04T02:47:16-08:00"
                        
@@ -33,7 +33,7 @@ describe GithubStreakCheck do
 
     it "<today's event> : true" do
       FakeWeb.register_uri(:get,
-        "https://api.github.com/users/#{@login}/events?per_page=1",
+        "https://api.github.com/users/#{@login}/events?per_page=300",
         body: '[{"created_at":"2013-11-04T10:47:16Z"}]'
                          # == "2013-11-04T02:47:16-08:00"
                        
@@ -45,7 +45,7 @@ describe GithubStreakCheck do
 
     it "<today's event> <tomorrow's event> : true" do
       FakeWeb.register_uri(:get,
-        "https://api.github.com/users/#{@login}/events?per_page=1",
+        "https://api.github.com/users/#{@login}/events?per_page=300",
         body: '[{"created_at":"2013-11-05T10:47:16Z"},' +
                          # == "2013-11-05T02:47:16-08:00"
                '{"created_at":"2013-11-04T10:47:16Z"}]'
@@ -60,7 +60,7 @@ describe GithubStreakCheck do
     # Note: this happens when user is living in Tokyo, for example.
     it "<tomorrow's event> : false" do
       FakeWeb.register_uri(:get,
-        "https://api.github.com/users/#{@login}/events?per_page=1",
+        "https://api.github.com/users/#{@login}/events?per_page=300",
         body: '[{"created_at":"2013-11-04T10:47:16Z"}]'
                          # == "2013-11-04T02:47:16-08:00"
                        

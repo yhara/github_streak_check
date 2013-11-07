@@ -28,7 +28,7 @@ class GithubStreakCheck
   end
 
   def commited_today?
-    events = JSON.parse(open("https://api.github.com/users/#{@opts[:username]}/events?per_page=1").read)
+    events = JSON.parse(open("https://api.github.com/users/#{@opts[:username]}/events?per_page=300").read)
     return false if events.length == 0
 
     return events.any?{|event|
