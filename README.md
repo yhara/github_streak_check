@@ -1,6 +1,10 @@
 # github_streak_check
 
-TODO: Write a gem description
+GitHub's user page (eg. https://github.com/yhara) shows 'Longest Streak',
+how many successive days the user is keep contributing. 
+
+This RubyGem provides a command to check if you have done today's
+contribution and optionally send an email if not.
 
 ## Installation
 
@@ -8,15 +12,22 @@ TODO: Write a gem description
 
 ## Usage
 
-    $ github_streak_check && echo OK
+    $ github_streak_check GITHUB_USER_NAME
+
+Exit with status 0 if already did contribution, with 1 otherwise.
 
 ### Sending alert mail
 
-    $ github_streak_check -m foo@example.com
+    $ github_streak_check foo -m foo@example.com
 
 This will send an notification to the given mail address.
 github_streak_check uses [Pony](http://github.com/benprew/pony)'s default
 way to send email; use /usr/sbin/sendmail if exists, then try to send with SMTP on localhost.
+
+## Run test
+
+    $ bundle install
+    $ rspec
 
 ## Limitations
 
