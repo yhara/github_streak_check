@@ -6,6 +6,8 @@ how many successive days the user is keep contributing.
 This RubyGem provides a command to check if you have done today's
 contribution and optionally send an email if not.
 
+[![Build Status](https://travis-ci.org/yhara/github_streak_check.png?branch=master)](https://travis-ci.org/yhara/github_streak_check)
+
 ## Installation
 
     $ gem i github_streak_check
