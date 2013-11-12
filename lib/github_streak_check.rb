@@ -7,14 +7,16 @@ require 'pony'
 class GithubStreakCheck
   def initialize(opts)
     @opts = opts
+
+    @pst = ActiveSupport::TimeZone["Pacific Time (US & Canada)"]
   end
 
   def run
     if commited_today?
-      puts "Check OK: you've already done today(#{pst_today} PST)'s contribution."
+      puts "Check OK: you've already done today(#{@pst.today} PST)'s contribution."
       exit 0
     else
-      msg = "Check failed: You have not extended today(#{pst_today} PST)'s streak yet"
+      msg = "Check failed: You have not extended today(#{@pst.today} PST)'s streak yet"
       $stderr.puts msg
       if (addr = @opts[:mail_to])
         ret = Pony.mail(to: addr,
@@ -32,13 +34,7 @@ class GithubStreakCheck
     return false if events.length == 0
 
     return events.any?{|event|
-      Time.parse(event["created_at"]).to_date == pst_today
+      Time.parse(event["created_at"]).in_time_zone(@pst).to_date == @pst.today
     }
-  end
-
-  private
-
-  def pst_today
-    @pst_today ||= ActiveSupport::TimeZone["Pacific Time (US & Canada)"].today
   end
 end

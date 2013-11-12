@@ -22,11 +22,11 @@ describe GithubStreakCheck do
     it "<yesterday's event> : false" do
       FakeWeb.register_uri(:get,
         "https://api.github.com/users/#{@login}/events?per_page=300",
-        body: '[{"created_at":"2013-11-04T10:47:16Z"}]'
-                         # == "2013-11-04T02:47:16-08:00"
+        body: '[{"created_at":"2013-11-04T07:47:16Z"}]'
+                         # == "2013-11-03T23:47:16-08:00"
                        
       )
-      Timecop.freeze(Time.parse("2013-11-05T07:00:00-08:00")) do
+      Timecop.freeze(Time.parse("2013-11-04T07:00:00-08:00")) do
         expect(@checker.commited_today?).to be_false
       end
     end
