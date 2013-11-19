@@ -70,4 +70,22 @@ describe GithubStreakCheck do
       end
     end
   end
+
+  describe "#get_status" do
+    before do
+      @max_try = GithubStreakCheck::MAX_TRY
+      @checker.stub(:puts)
+    end
+
+    it "raises error after MAX_TRY" do
+      @checker.should_receive(:open).exactly(@max_try).times {
+        raise OpenURI::HTTPError.new(:dummy, :dummy)
+      }
+      @checker.should_receive(:sleep).exactly(@max_try-1).times
+
+      expect {
+        @checker.get_status
+      }.to raise_error(OpenURI::HTTPError)
+    end
+  end
 end

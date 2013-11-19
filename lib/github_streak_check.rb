@@ -30,11 +30,29 @@ class GithubStreakCheck
   end
 
   def commited_today?
-    events = JSON.parse(open("https://api.github.com/users/#{@opts[:username]}/events?per_page=300").read)
+    events = JSON.parse(get_status)
     return false if events.length == 0
 
     return events.any?{|event|
       Time.parse(event["created_at"]).in_time_zone(@pst).to_date == @pst.today
     }
+  end
+
+  MAX_TRY = 5
+  def get_status
+    try = 1
+    begin
+      open("https://api.github.com/users/#{@opts[:username]}/events?per_page=300").read
+    rescue OpenURI::HTTPError => ex
+      if try == MAX_TRY
+        raise
+      else
+        puts "#{ex.message} (#{ex.class})"
+        sleep 30
+
+        try += 1
+        retry
+      end
+    end
   end
 end
